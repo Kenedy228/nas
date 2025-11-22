@@ -21,18 +21,19 @@ class Solver:
         return block.lamda / block.mu
 
     # поиск числа обслуживающих органов
-    def find_number_of_service_body(availability_factor, ro):
+    def find_number_of_service_body(probability_of_failure, ro):
 
         # определение функции для поиска значения n
         def equation(n):
             numerator = ro**n / gamma(n + 1)
             denominator = sum(ro**i / gamma(i + 1) for i in range(int(n) + 1))
-            return numerator / denominator - availability_factor
+            return numerator / denominator - probability_of_failure
 
         n_initial_guess = ro
         n_solution = fsolve(equation, n_initial_guess)
         return n_solution
 
+    # поиск длительности переходных процессов
     def find_duration_of_transient_processes(lamda, mu):
         def find_durations():
             def system(t, p):
@@ -77,9 +78,8 @@ class Solver:
 
         return durations, deltas, time
 
-    def find_availability_factors_function(block):
-        times = np.linspace(0, 50 * 0.1, 51)
-
+    # поиск значений функции коэффициента готовности
+    def find_availability_factors_function(block, times):
         function_values = []
 
         for i in range(50):

@@ -1,6 +1,7 @@
 from block import *
 from presentator import *
 from solver import *
+import numpy as np
 
 blocks = [
     Block(
@@ -24,39 +25,43 @@ blocks = [
 ]
 
 print("\nДано\n")
-for i in range(len(blocks)):
-    Presentator.print_block(block=blocks[i])
+Presentator.print_blocks(blocks)
 
 print(
     "\nКоэффициенты готовности для каждого элемента внутри блоков: Кг[n] = 1 - p[n]\n"
 )
+availability_factors = []
 for i in range(len(blocks)):
     block = blocks[i]
-    availability_factors = Solver.find_availability_factors(block)
-    Presentator.print_availability_factors(block, availability_factors)
+    factors = Solver.find_availability_factors(block)
+    availability_factors.append(factors)
+Presentator.print_availability_factors(blocks, availability_factors)
 
 print("\nРо для каждого блока: ρ[n] = λ[n] / μ[n]\n")
+blocks_ro = []
 for i in range(len(blocks)):
     block = blocks[i]
     ro = Solver.find_ro(block)
-    Presentator.print_ro(block, ro)
+    blocks_ro.append([ro])
+Presentator.print_blocks_ro(blocks, blocks_ro)
 
 print("\nЧисло обслуживающих органов для каждого блока\n")
+numbers_of_service_bodies = []
 for i in range(len(blocks)):
     block = blocks[i]
     ro = Solver.find_ro(block)
 
-    numbers_of_service_bodies = []
+    current_number_of_service_body = []
     for j in range(len(block.probabilities_of_failure)):
-        factor = block.probabilities_of_failure[j]
+        probability_of_failure = block.probabilities_of_failure[j]
         number_of_service_body = Solver.find_number_of_service_body(
-            availability_factor=factor, ro=ro
+            probability_of_failure=probability_of_failure, ro=ro
         )
-        numbers_of_service_bodies.append(math.ceil(number_of_service_body))
-
-    Presentator.print_numbers_of_service_bodies(
-        block, numbers_of_service_bodies=numbers_of_service_bodies
-    )
+        current_number_of_service_body.append(math.ceil(number_of_service_body))
+    numbers_of_service_bodies.append(current_number_of_service_body)
+Presentator.print_numbers_of_service_bodies(
+    blocks, numbers_of_service_bodies=numbers_of_service_bodies
+)
 
 print("\nОпределение длительности переходных процессов для каждого блока\n")
 for i in range(len(blocks)):
@@ -69,18 +74,19 @@ for i in range(len(blocks)):
     )
 
 print("\nОпределение функции коэффициента готовности для каждого блока\n")
-block_availability_factors_function_values = []
+blocks_availability_factors_function = []
+times = np.linspace(0, 50 * 0.1, 51)
 for i in range(len(blocks)):
     block = blocks[i]
     availability_factors_function_values = Solver.find_availability_factors_function(
-        block
+        block,
+        times
     )
-    block_availability_factors_function_values.append(
+    blocks_availability_factors_function.append(
         availability_factors_function_values
     )
-times = np.linspace(0, 50 * 0.1, 51)
 Presentator.print_availability_factors_functions(
-    block=block,
-    functions_values=block_availability_factors_function_values,
+    blocks=blocks,
+    functions=blocks_availability_factors_function,
     times=times,
 )
