@@ -55,7 +55,7 @@ def print_availability_factors():
         factors = Solver.find_availability_factors(block)
         availability_factors.append(factors)
     
-    title = "\nКоэффициенты готовности для каждого элемента внутри блоков: Кг[n] = 1 - p[n]\n"
+    title = "\nКоэффициенты готовности для каждого элемента внутри блоков: Кг[n] = 1 - p[n][i]\n"
     conclusion = ""
     headers = ["Кг[1]", "Кг[2]", "Кг[3]", "Кг[4]"]
     indexes = []
